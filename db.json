@@ -1,0 +1,20 @@
+{
+  "feedback": [
+    {
+      "rating": 3,
+      "text": "Commodo reprehenderit emile",
+      "id": 1
+    },
+    {
+      "id": 2,
+      "rating": 5,
+      "reverse": true,
+      "text": "Labore non cupidatat adipisicing occaecat elit ut tempor voluptate laborum ut."
+    },
+    {
+      "id": 3,
+      "rating": 1,
+      "text": "Id ea ullamco dolore eiusmod ipsum id do et aute sint ea duis ipsum cupidatat."
+    }
+  ]
+}

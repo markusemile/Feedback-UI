@@ -12,7 +12,7 @@ function FeedbackForm() {
   const [disabledBut,setDisabledBut] = useState(true);
   const [message,setMessage]=useState('');
 
-  const {addFeedback,feedbackEdit,setSelected,selected,update,setUpdate,review,setreview} = useContext(FeedbackContext) ;
+  const {addFeedback,feedbackEdit,setSelected,selected,update,setUpdate,review,setreview,idSelected,setIdSelected} = useContext(FeedbackContext) ;
 
   
   useEffect(()=>{
@@ -49,7 +49,7 @@ function FeedbackForm() {
    <Card reverse={false}>
      <h1 className="mx-auto">FEEDBACK UI</h1>
      <div className="about-link">
-     <AboutIconLink  />
+       <AboutIconLink  />
      </div>
      <form className="d-flex flex-column justify-items-center align-items-center" onSubmit={(e)=>handleSubmit(e)} > 
        <h2>How would you rate your service with us ?</h2>

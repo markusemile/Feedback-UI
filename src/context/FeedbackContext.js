@@ -1,5 +1,7 @@
-import {createContext,useState} from "react"
+import {createContext,useState,useEffect} from "react"
 import {v4 as uuidv4} from 'uuid';
+import Header from './../components/Header';
+
 
 const FeedbackContext = createContext();
 
@@ -7,27 +9,10 @@ export const FeedbackProvider = ({children}) => {
 
     // the id of the edit button when we click on 
     
-    const [feedback, setFeedBack] = useState([
-        {
-            id:1,
-            rating:9,
-            reverse:false,
-            text:'Commodo reprehenderit aute cupidatat ipsum occaecat non cupidatat aliqua ut culpa eiusmod laborum.'
-        },
-        {
-            id:2,
-            rating:5,
-            reverse:true,
-            text:'Labore non cupidatat adipisicing occaecat elit ut tempor voluptate laborum ut.'
-        },
-        {
-            id:3,
-            rating:1,
-            text:'Id ea ullamco dolore eiusmod ipsum id do et aute sint ea duis ipsum cupidatat.'
-        },
-    ]);
-
+    const [feedback, setFeedBack] = useState([]);
+    const [idSelected,setIdSelected] = useState();
     const [selected,setSelected]= useState();
+    const [isLoading, setIsLoading] = useState(true);
     const [update,setUpdate] = useState(false);
     const [review, setreview] = useState('Write a review');
 
@@ -40,25 +25,60 @@ export const FeedbackProvider = ({children}) => {
         edit:false
     })
 
+
+
+    useEffect (()=>{
+        fetchDatas();
+    },[])
+    
+
+    const fetchDatas = async()=>{
+        const response = await fetch(`http://localhost:5000/feedback?sort=id`);
+        const datas = await response.json();
+        setFeedBack(datas);
+        setIsLoading(false);
+    }
+
     const handleChange = (e) =>{        
         document.getElementById('num'+selected).nextSibling.classList.remove('active');
         document.getElementById('num'+e.currentTarget.id).nextSibling.classList.add('active');
         setSelected(Number(e.currentTarget.id));
       }
 
-    const handleDelete = (id) => {
+    const handleDelete =  async(id) => {
         if(window.confirm('Are you ure ?')){
-            setFeedBack(feedback.filter((item)=>item.id !== id))
+            await fetch(`http://localhost:5000/feedback/${id}`,{method:'DELETE'});
+         setFeedBack(feedback.filter((item)=>item.id !== id))
         }          
       }
     
-    const addFeedback = (newFeedback) => {
+    const addFeedback = async(newFeedback,id) => {
         if(!update){
+            const response = await fetch('http://localhost:5000/feedback',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body : JSON.stringify(newFeedback)
+                 
+        }
+        );
             newFeedback.id=uuidv4();
-            setFeedBack([...feedback,newFeedback]);    
+            const data = await response.json();
+             setFeedBack([...feedback,data]);    
         }else{
-             const newfeed = feedback.map((item)=>item.id===feedbackEdit.item.id ? {...item,rating:selected,text:review} : {...item} ) ;
-            setFeedBack(newfeed);
+                const response = await fetch(`http://localhost:5000/feedback/${feedbackEdit.item.id}`,{
+                method:"PUT",
+                headers:{'Content-Type':'application/json'},
+                body : JSON.stringify(newFeedback)
+
+            })
+            const data = await response.json();
+            const newfeed = feedback.map((item)=>item.id===data.id ? {...data} : {...item} ) ;
+            console.log('====================================');
+            console.log(newfeed);
+            console.log('====================================');
+            
+
+             setFeedBack(newfeed);
         }
         initialize();
     }
@@ -73,7 +93,10 @@ export const FeedbackProvider = ({children}) => {
     }
 
     const editFeedback = (item) => {
-        console.log(item);
+        
+        
+        // console.log('item->');
+        // console.log(item);
         setFeedbackEdit({
             item,
             edit:true
@@ -100,7 +123,10 @@ export const FeedbackProvider = ({children}) => {
             update,
             setUpdate,
             review,
-            setreview
+            setreview,
+            isLoading,
+            idSelected,
+            setIdSelected
 
         }} >
             {children}
